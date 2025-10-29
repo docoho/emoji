@@ -60,17 +60,17 @@ const updateKeywords = (e) => {
 
 <template>
   <article class="card">
-    <div v-if="!isEditing">
+    <div v-if="!isEditing" class="card-content">
       <div class="symbol" aria-hidden="true">{{ emoji.symbol }}</div>
-      <h3>{{ emoji.title }}</h3>
+      <h3 class="title">{{ emoji.title }}</h3>
       <p v-if="emoji.description" class="description">{{ emoji.description }}</p>
       <ul class="meta">
         <li v-if="emoji.category">{{ emoji.category }}</li>
         <li v-for="tag in emoji.keywords" :key="tag">#{{ tag }}</li>
       </ul>
       <div v-if="emoji.can_delete" class="actions">
-        <button type="button" class="edit" @click="startEdit">Edit</button>
-        <button type="button" class="delete" @click="handleDelete">Delete</button>
+        <button type="button" class="edit" @click.stop="startEdit">Edit</button>
+        <button type="button" class="delete" @click.stop="handleDelete">Delete</button>
       </div>
     </div>
 
@@ -95,9 +95,9 @@ const updateKeywords = (e) => {
 
 <style scoped>
 .card {
+  height: 320px;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
   padding: 1.25rem;
   border-radius: 1rem;
   background: rgba(255, 255, 255, 0.75);
@@ -105,6 +105,7 @@ const updateKeywords = (e) => {
   border: 1px solid rgba(233, 233, 233, 0.8);
   box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
   transition: transform 0.18s ease, box-shadow 0.18s ease;
+  overflow: hidden;
 }
 
 .card:hover {
@@ -112,14 +113,43 @@ const updateKeywords = (e) => {
   box-shadow: 0 12px 34px rgba(15, 23, 42, 0.12);
 }
 
+.card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  height: 100%;
+  overflow: hidden;
+}
+
 .symbol {
-  font-size: 2.5rem;
+  font-size: 3rem;
   line-height: 1;
+  text-align: center;
+  padding: 0.5rem 0;
+  flex-shrink: 0;
+}
+
+.title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0;
+  flex-shrink: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .description {
   color: #4b5563;
-  font-size: 0.95rem;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-height: 2.8em;
 }
 
 .meta {
@@ -129,20 +159,29 @@ const updateKeywords = (e) => {
   list-style: none;
   padding: 0;
   margin: 0;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   color: #6b7280;
+  flex-grow: 1;
+  overflow: hidden;
+  max-height: 5.5rem;
+  align-content: flex-start;
 }
 
 .meta li {
   background: rgba(15, 23, 42, 0.05);
   border-radius: 999px;
   padding: 0.25rem 0.6rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+  height: fit-content;
 }
 
 .actions {
   display: flex;
   gap: 0.5rem;
-  margin-top: 0.5rem;
+  margin-top: auto;
+  padding-top: 0.5rem;
+  flex-shrink: 0;
 }
 
 .edit {
