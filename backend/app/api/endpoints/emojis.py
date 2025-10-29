@@ -4,12 +4,9 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlmodel import Session, col, or_, select
 
 from app.api.deps import get_current_user, get_optional_user
-from app.data.emojis import EMOJI_CATALOG
 from app.db import get_session
 from app.models import EmojiSubmission, User
 from app.schemas import Emoji, EmojiCreate, EmojiListResponse, EmojiUpdate
-
-SUBMISSION_ID_OFFSET = 1000
 
 router = APIRouter(prefix="/emojis", tags=["emojis"])
 
@@ -72,7 +69,7 @@ def list_emojis(
     submissions = session.exec(query).all()
     
     # Convert to response format
-    merged: list[Emoji] = []
+    items: list[Emoji] = []
     for submission in submissions:
         can_delete = False
         if current_user is not None:
@@ -80,9 +77,9 @@ def list_emojis(
                 can_delete = True
             elif submission.submitter_id is None and submission.submitter_email == current_user.email:
                 can_delete = True
-        merged.append(
+        items.append(
             Emoji(
-                id=SUBMISSION_ID_OFFSET + submission.id,
+                id=submission.id,
                 symbol=submission.symbol,
                 title=submission.title,
                 description=submission.description,
@@ -93,22 +90,9 @@ def list_emojis(
             )
         )
     
-    # Include catalog emojis only on first page with no filters
-    if offset == 0 and not search and not category:
-        catalog_emojis = EMOJI_CATALOG[:limit]
-        remaining_slots = limit - len(catalog_emojis)
-        if remaining_slots > 0:
-            all_items = [*catalog_emojis, *merged[:remaining_slots]]
-        else:
-            all_items = catalog_emojis
-        total = len(EMOJI_CATALOG) + total_submissions
-    else:
-        all_items = merged
-        total = total_submissions
-    
     return EmojiListResponse(
-        items=all_items,
-        total=total,
+        items=items,
+        total=total_submissions,
         limit=limit,
         offset=offset,
     )
@@ -121,10 +105,7 @@ def create_emoji(
     current_user: User = Depends(get_current_user),
 ) -> Emoji:
     normalized_keywords = sorted({tag.strip() for tag in payload.keywords if tag.strip()})
-    for emoji in EMOJI_CATALOG:
-        if emoji.symbol == payload.symbol and emoji.title.lower() == payload.title.lower():
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Emoji already exists")
-
+    
     existing = session.exec(
         select(EmojiSubmission).where(
             EmojiSubmission.symbol == payload.symbol,
@@ -149,7 +130,7 @@ def create_emoji(
     session.refresh(submission)
 
     return Emoji(
-        id=SUBMISSION_ID_OFFSET + submission.id,
+        id=submission.id,
         symbol=submission.symbol,
         title=submission.title,
         description=submission.description,
@@ -167,11 +148,7 @@ def update_emoji(
     session: Session = Depends(get_session),
     current_user: User = Depends(get_current_user),
 ) -> Emoji:
-    if emoji_id < SUBMISSION_ID_OFFSET:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Emoji not found")
-
-    submission_id = emoji_id - SUBMISSION_ID_OFFSET
-    submission = session.get(EmojiSubmission, submission_id)
+    submission = session.get(EmojiSubmission, emoji_id)
     if submission is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Emoji not found")
 
@@ -198,7 +175,7 @@ def update_emoji(
     session.refresh(submission)
 
     return Emoji(
-        id=SUBMISSION_ID_OFFSET + submission.id,
+        id=submission.id,
         symbol=submission.symbol,
         title=submission.title,
         description=submission.description,
@@ -215,11 +192,7 @@ def delete_emoji(
     session: Session = Depends(get_session),
     current_user: User = Depends(get_current_user),
 ) -> None:
-    if emoji_id < SUBMISSION_ID_OFFSET:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Emoji not found")
-
-    submission_id = emoji_id - SUBMISSION_ID_OFFSET
-    submission = session.get(EmojiSubmission, submission_id)
+    submission = session.get(EmojiSubmission, emoji_id)
     if submission is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Emoji not found")
 
