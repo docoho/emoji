@@ -131,25 +131,27 @@ watch(token, () => {
 
     <section class="content">
       <div class="filters">
-        <div class="search-container">
-          <input
-            v-model="searchQuery"
-            type="text"
-            placeholder="Search emojis..."
-            class="search-input"
-            @keyup.enter="handleSearch"
-          />
-          <button 
-            v-if="searchQuery" 
-            class="clear-btn" 
-            @click="clearSearch"
-            type="button"
-            aria-label="Clear search"
-          >
-            ✕
-          </button>
+        <div class="search-row">
+          <div class="search-container">
+            <input
+              v-model="searchQuery"
+              type="text"
+              placeholder="Search emojis..."
+              class="search-input"
+              @keyup.enter="handleSearch"
+            />
+            <button 
+              v-if="searchQuery" 
+              class="clear-btn" 
+              @click="clearSearch"
+              type="button"
+              aria-label="Clear search"
+            >
+              ✕
+            </button>
+          </div>
+          <button class="search-btn" @click="handleSearch">Search</button>
         </div>
-        <button class="search-btn" @click="handleSearch">Search</button>
         <div class="filter-group">
           <select v-model="categoryFilter" class="filter-select" @change="handleFilterChange">
             <option value="">All Categories</option>
@@ -271,10 +273,25 @@ watch(token, () => {
   }
 }
 
+.search-row {
+  display: flex;
+  gap: 0.75rem;
+  width: 100%;
+  max-width: 700px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+@media (min-width: 640px) {
+  .search-row {
+    flex-wrap: nowrap;
+  }
+}
+
 .search-container {
   position: relative;
-  width: 100%;
-  max-width: 600px;
+  flex: 1;
+  min-width: 200px;
   display: flex;
   align-items: center;
 }
@@ -316,7 +333,7 @@ watch(token, () => {
 }
 
 .search-btn {
-  padding: 0.6rem 2rem;
+  padding: 0.6rem 1.5rem;
   background: linear-gradient(120deg, #6366f1, #ec4899);
   color: white;
   border: none;
@@ -325,6 +342,7 @@ watch(token, () => {
   cursor: pointer;
   white-space: nowrap;
   font-size: 1rem;
+  flex-shrink: 0;
 }
 
 .search-btn:hover {
