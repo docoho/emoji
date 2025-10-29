@@ -189,45 +189,71 @@ watch(token, () => {
 <style scoped>
 .page {
   min-height: 100vh;
-  padding: 4rem 1.5rem;
+  padding: 2rem 1rem;
   background: radial-gradient(circle at top, #fdf2f8, #e0f2fe, #ede9fe);
   color: #0f172a;
 }
 
+@media (min-width: 768px) {
+  .page {
+    padding: 4rem 1.5rem;
+  }
+}
+
 .hero {
   max-width: 720px;
-  margin: 0 auto 2.5rem auto;
+  margin: 0 auto 2rem auto;
   text-align: center;
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+  padding: 0 1rem;
+}
+
+@media (min-width: 768px) {
+  .hero {
+    margin: 0 auto 2.5rem auto;
+  }
 }
 
 .hero h1 {
-  font-size: clamp(2.5rem, 5vw, 3.5rem);
+  font-size: clamp(2rem, 5vw, 3.5rem);
   font-weight: 700;
 }
 
 .hero p {
   color: #475569;
-  font-size: 1.05rem;
+  font-size: clamp(0.95rem, 2vw, 1.05rem);
 }
 
 .content {
-  max-width: 1080px;
+  max-width: 1280px;
   margin: 0 auto;
+  padding: 0 1rem;
+}
+
+@media (min-width: 1400px) {
+  .content {
+    max-width: 1400px;
+  }
 }
 
 .filters {
   display: flex;
   gap: 0.75rem;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
   flex-wrap: wrap;
-  align-items: center;
+  align-items: stretch;
+}
+
+@media (min-width: 768px) {
+  .filters {
+    margin-bottom: 2rem;
+  }
 }
 
 .search-input {
-  flex: 1;
+  flex: 1 1 100%;
   min-width: 200px;
   padding: 0.6rem 1rem;
   border-radius: 0.5rem;
@@ -235,7 +261,14 @@ watch(token, () => {
   font-size: 0.95rem;
 }
 
+@media (min-width: 640px) {
+  .search-input {
+    flex: 1 1 auto;
+  }
+}
+
 .search-btn {
+  flex: 0 0 auto;
   padding: 0.6rem 1.5rem;
   background: linear-gradient(120deg, #6366f1, #ec4899);
   color: white;
@@ -243,6 +276,7 @@ watch(token, () => {
   border-radius: 0.5rem;
   font-weight: 600;
   cursor: pointer;
+  white-space: nowrap;
 }
 
 .search-btn:hover {
@@ -250,6 +284,8 @@ watch(token, () => {
 }
 
 .filter-select {
+  flex: 1 1 calc(50% - 0.375rem);
+  min-width: 140px;
   padding: 0.6rem 1rem;
   border-radius: 0.5rem;
   border: 1px solid #cbd5e1;
@@ -258,13 +294,29 @@ watch(token, () => {
   cursor: pointer;
 }
 
+@media (min-width: 640px) {
+  .filter-select {
+    flex: 0 1 auto;
+  }
+}
+
 .layout {
   display: grid;
-  gap: 2.5rem;
+  gap: 2rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 900px) {
+  .layout {
+    gap: 2.5rem;
+    grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
+    align-items: start;
+  }
 }
 
 .form-stack {
   min-width: 0;
+  width: 100%;
 }
 
 .placeholder {
@@ -279,14 +331,25 @@ watch(token, () => {
 
 .pagination {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: 1.5rem;
+  gap: 1rem;
   margin-top: 2rem;
-  padding: 1.5rem;
+  padding: 1rem;
+}
+
+@media (min-width: 640px) {
+  .pagination {
+    flex-direction: row;
+    gap: 1.5rem;
+    padding: 1.5rem;
+  }
 }
 
 .page-btn {
+  width: 100%;
+  max-width: 200px;
   padding: 0.6rem 1.2rem;
   background: white;
   border: 1px solid #cbd5e1;
@@ -294,6 +357,12 @@ watch(token, () => {
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
+}
+
+@media (min-width: 640px) {
+  .page-btn {
+    width: auto;
+  }
 }
 
 .page-btn:hover:not(:disabled) {
@@ -309,7 +378,15 @@ watch(token, () => {
 
 .page-info {
   color: #475569;
-  font-size: 0.95rem;
+  font-size: clamp(0.85rem, 2vw, 0.95rem);
+  text-align: center;
+  order: -1;
+}
+
+@media (min-width: 640px) {
+  .page-info {
+    order: 0;
+  }
 }
 
 .status {
@@ -323,14 +400,5 @@ watch(token, () => {
 
 .status.success {
   color: #047857;
-}
-</style>
-
-<style>
-@media (min-width: 900px) {
-  .layout {
-    grid-template-columns: minmax(0, 360px) minmax(0, 1fr);
-    align-items: start;
-  }
 }
 </style>
