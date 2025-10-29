@@ -208,30 +208,30 @@ watch(token, () => {
 <style scoped>
 .page {
   min-height: 100vh;
-  padding: 2rem 1rem;
+  padding: 1rem 1rem;
   background: radial-gradient(circle at top, #fdf2f8, #e0f2fe, #ede9fe);
   color: #0f172a;
 }
 
 @media (min-width: 768px) {
   .page {
-    padding: 4rem 1.5rem;
+    padding: 2rem 1.5rem;
   }
 }
 
 .hero {
   max-width: 720px;
-  margin: 0 auto 2rem auto;
+  margin: 0 auto 1rem auto;
   text-align: center;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.5rem;
   padding: 0 1rem;
 }
 
 @media (min-width: 768px) {
   .hero {
-    margin: 0 auto 2.5rem auto;
+    margin: 0 auto 1.5rem auto;
   }
 }
 
