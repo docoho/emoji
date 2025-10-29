@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Optional
 
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 
 
 class Token(BaseModel):
@@ -19,4 +19,25 @@ class UserLoginRequest(BaseModel):
     password: str
 
 
-__all__ = ["Token", "TokenPayload", "UserLoginRequest"]
+class PasswordResetRequest(BaseModel):
+    email: EmailStr
+
+
+class PasswordResetConfirm(BaseModel):
+    token: str
+    new_password: str = Field(min_length=8)
+
+
+class PasswordResetResponse(BaseModel):
+    message: str
+    reset_token: Optional[str] = None
+
+
+__all__ = [
+    "Token",
+    "TokenPayload",
+    "UserLoginRequest",
+    "PasswordResetRequest",
+    "PasswordResetConfirm",
+    "PasswordResetResponse",
+]

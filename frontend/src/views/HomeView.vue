@@ -3,13 +3,20 @@ import { onMounted, ref, watch } from 'vue'
 
 import EmojiGrid from '../components/EmojiGrid.vue'
 import EmojiSubmitForm from '../components/EmojiSubmitForm.vue'
-import { deleteEmoji, fetchEmojis, submitEmoji } from '../services/api'
+import { deleteEmoji, fetchEmojis, submitEmoji, updateEmoji } from '../services/api'
 import { useAuth } from '../composables/useAuth'
 
 const emojis = ref([])
+const total = ref(0)
 const loading = ref(true)
 const error = ref('')
 const actionMessage = ref('')
+
+const searchQuery = ref('')
+const categoryFilter = ref('')
+const sortOrder = ref('date_desc')
+const currentPage = ref(1)
+const pageSize = ref(20)
 
 const { token, isAuthenticated } = useAuth()
 
@@ -18,7 +25,16 @@ const loadEmojis = async () => {
   error.value = ''
   actionMessage.value = ''
   try {
-    emojis.value = await fetchEmojis(token.value)
+    const params = {
+      search: searchQuery.value || undefined,
+      category: categoryFilter.value || undefined,
+      sort: sortOrder.value,
+      limit: pageSize.value,
+      offset: (currentPage.value - 1) * pageSize.value,
+    }
+    const response = await fetchEmojis(token.value, params)
+    emojis.value = response.items || response
+    total.value = response.total || (response.items ? response.items.length : response.length)
   } catch (err) {
     error.value = err.message ?? 'Failed to load emojis'
   } finally {
@@ -26,15 +42,41 @@ const loadEmojis = async () => {
   }
 }
 
+const handleSearch = () => {
+  currentPage.value = 1
+  loadEmojis()
+}
+
+const handleFilterChange = () => {
+  currentPage.value = 1
+  loadEmojis()
+}
+
 const handleSubmit = async (payload) => {
   actionMessage.value = ''
   error.value = ''
   try {
     const created = await submitEmoji(payload, token.value)
-    emojis.value = [...emojis.value, created]
+    emojis.value = [created, ...emojis.value]
+    total.value += 1
     actionMessage.value = 'Emoji submitted successfully.'
   } catch (err) {
     error.value = err.message ?? 'Failed to submit emoji'
+  }
+}
+
+const handleUpdate = async (emoji, payload) => {
+  actionMessage.value = ''
+  error.value = ''
+  try {
+    const updated = await updateEmoji(emoji.id, payload, token.value)
+    const index = emojis.value.findIndex((item) => item.id === emoji.id)
+    if (index !== -1) {
+      emojis.value[index] = updated
+    }
+    actionMessage.value = 'Emoji updated successfully.'
+  } catch (err) {
+    error.value = err.message ?? 'Failed to update emoji'
   }
 }
 
@@ -44,11 +86,28 @@ const handleDelete = async (emoji) => {
   try {
     await deleteEmoji(emoji.id, token.value)
     emojis.value = emojis.value.filter((item) => item.id !== emoji.id)
+    total.value -= 1
     actionMessage.value = 'Emoji deleted.'
   } catch (err) {
     error.value = err.message ?? 'Failed to delete emoji'
   }
 }
+
+const nextPage = () => {
+  if (currentPage.value * pageSize.value < total.value) {
+    currentPage.value += 1
+    loadEmojis()
+  }
+}
+
+const prevPage = () => {
+  if (currentPage.value > 1) {
+    currentPage.value -= 1
+    loadEmojis()
+  }
+}
+
+const totalPages = () => Math.ceil(total.value / pageSize.value)
 
 onMounted(loadEmojis)
 
@@ -65,6 +124,34 @@ watch(token, () => {
     </header>
 
     <section class="content">
+      <div class="filters">
+        <input
+          v-model="searchQuery"
+          type="text"
+          placeholder="Search emojis..."
+          class="search-input"
+          @keyup.enter="handleSearch"
+        />
+        <button class="search-btn" @click="handleSearch">Search</button>
+        <select v-model="categoryFilter" class="filter-select" @change="handleFilterChange">
+          <option value="">All Categories</option>
+          <option value="People">People</option>
+          <option value="Nature">Nature</option>
+          <option value="Food">Food</option>
+          <option value="Activities">Activities</option>
+          <option value="Travel">Travel</option>
+          <option value="Objects">Objects</option>
+          <option value="Symbols">Symbols</option>
+          <option value="Flags">Flags</option>
+        </select>
+        <select v-model="sortOrder" class="filter-select" @change="handleFilterChange">
+          <option value="date_desc">Newest First</option>
+          <option value="date_asc">Oldest First</option>
+          <option value="title_asc">Title A-Z</option>
+          <option value="title_desc">Title Z-A</option>
+        </select>
+      </div>
+
       <p v-if="loading" class="status">Loading emojis…</p>
       <p v-else-if="error" class="status error">{{ error }}</p>
       <div v-else class="layout">
@@ -78,7 +165,21 @@ watch(token, () => {
             <p>Please log in to submit new entries.</p>
           </div>
         </div>
-        <EmojiGrid :emojis="emojis" @delete="handleDelete" />
+        <div>
+          <EmojiGrid :emojis="emojis" @delete="handleDelete" @update="handleUpdate" />
+          
+          <div v-if="totalPages() > 1" class="pagination">
+            <button :disabled="currentPage === 1" @click="prevPage" class="page-btn">
+              ← Previous
+            </button>
+            <span class="page-info">
+              Page {{ currentPage }} of {{ totalPages() }} ({{ total }} total)
+            </span>
+            <button :disabled="currentPage >= totalPages()" @click="nextPage" class="page-btn">
+              Next →
+            </button>
+          </div>
+        </div>
       </div>
       <p v-if="actionMessage" class="status success">{{ actionMessage }}</p>
     </section>
@@ -117,6 +218,46 @@ watch(token, () => {
   margin: 0 auto;
 }
 
+.filters {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.search-input {
+  flex: 1;
+  min-width: 200px;
+  padding: 0.6rem 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid #cbd5e1;
+  font-size: 0.95rem;
+}
+
+.search-btn {
+  padding: 0.6rem 1.5rem;
+  background: linear-gradient(120deg, #6366f1, #ec4899);
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.search-btn:hover {
+  opacity: 0.9;
+}
+
+.filter-select {
+  padding: 0.6rem 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid #cbd5e1;
+  font-size: 0.95rem;
+  background: white;
+  cursor: pointer;
+}
+
 .layout {
   display: grid;
   gap: 2.5rem;
@@ -134,6 +275,41 @@ watch(token, () => {
   text-align: center;
   display: grid;
   gap: 0.5rem;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1.5rem;
+  margin-top: 2rem;
+  padding: 1.5rem;
+}
+
+.page-btn {
+  padding: 0.6rem 1.2rem;
+  background: white;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.page-btn:hover:not(:disabled) {
+  background: linear-gradient(120deg, #6366f1, #ec4899);
+  color: white;
+  border-color: transparent;
+}
+
+.page-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.page-info {
+  color: #475569;
+  font-size: 0.95rem;
 }
 
 .status {

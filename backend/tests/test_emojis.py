@@ -20,9 +20,14 @@ def test_list_emojis(client: TestClient) -> None:
     response = client.get("/api/emojis")
     assert response.status_code == 200
     data = response.json()
-    assert isinstance(data, list)
-    assert len(data) >= 3
-    first = data[0]
+    assert isinstance(data, dict)
+    assert "items" in data
+    assert "total" in data
+    assert "limit" in data
+    assert "offset" in data
+    assert isinstance(data["items"], list)
+    assert len(data["items"]) >= 3
+    first = data["items"][0]
     assert {"id", "symbol", "title", "keywords", "can_delete"}.issubset(first.keys())
 
 
@@ -46,7 +51,8 @@ def test_submit_emoji(client: TestClient) -> None:
     assert body["can_delete"] is True
 
     list_response = client.get("/api/emojis", headers=headers)
-    assert any(item["title"] == payload["title"] for item in list_response.json())
+    items = list_response.json()["items"]
+    assert any(item["title"] == payload["title"] for item in items)
 
 
 def test_duplicate_submission_rejected(client: TestClient) -> None:
@@ -81,7 +87,8 @@ def test_delete_requires_owner(client: TestClient) -> None:
     assert delete_response.status_code == 204
 
     follow_up = client.get("/api/emojis", headers=owner_headers)
-    assert all(item["id"] != emoji_id for item in follow_up.json())
+    items = follow_up.json()["items"]
+    assert all(item["id"] != emoji_id for item in items)
 
 
 def test_delete_for_legacy_entries_with_matching_email(client: TestClient) -> None:
@@ -108,7 +115,8 @@ def test_delete_for_legacy_entries_with_matching_email(client: TestClient) -> No
         )
 
     list_response = client.get("/api/emojis", headers=headers)
-    assert any(item["id"] == emoji_id and item["can_delete"] for item in list_response.json())
+    items = list_response.json()["items"]
+    assert any(item["id"] == emoji_id and item["can_delete"] for item in items)
 
     delete_response = client.delete(f"/api/emojis/{emoji_id}", headers=headers)
     assert delete_response.status_code == 204

@@ -71,9 +71,14 @@ const handleSubmit = async (event) => {
       <p v-if="error" class="feedback error" role="alert">{{ error }}</p>
       <p v-if="success" class="feedback success">{{ success }}</p>
 
-      <router-link class="link" :to="{ name: 'register' }">
-        Need an account? Register now
-      </router-link>
+      <div class="links">
+        <router-link class="link" :to="{ name: 'forgot-password' }">
+          Forgot password?
+        </router-link>
+        <router-link class="link" :to="{ name: 'register' }">
+          Need an account? Register now
+        </router-link>
+      </div>
     </form>
   </main>
 </template>
@@ -143,6 +148,12 @@ button:disabled {
 
 .feedback.success {
   color: #047857;
+}
+
+.links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .link {

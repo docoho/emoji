@@ -4,10 +4,22 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlmodel import Session, select
 
 from app.api.deps import get_current_user
-from app.core.security import create_access_token, hash_password, verify_password
+from app.core.security import (
+    create_access_token,
+    create_password_reset_token,
+    hash_password,
+    verify_password,
+    verify_password_reset_token,
+)
 from app.db import get_session
 from app.models import User
-from app.schemas.auth import Token, UserLoginRequest
+from app.schemas.auth import (
+    PasswordResetConfirm,
+    PasswordResetRequest,
+    PasswordResetResponse,
+    Token,
+    UserLoginRequest,
+)
 from app.schemas.user import UserCreate, UserPublic
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -48,6 +60,45 @@ def login_user(payload: UserLoginRequest, session: Session = Depends(get_session
 @router.get("/me", response_model=UserPublic)
 def read_current_user(current_user: User = Depends(get_current_user)) -> UserPublic:
     return current_user
+
+
+@router.post("/password-reset/request", response_model=PasswordResetResponse)
+def request_password_reset(
+    payload: PasswordResetRequest, session: Session = Depends(get_session)
+) -> PasswordResetResponse:
+    statement = select(User).where(User.email == payload.email)
+    user = session.exec(statement).first()
+    
+    if user is None:
+        return PasswordResetResponse(message="If the email exists, a reset link will be sent")
+    
+    reset_token = create_password_reset_token(user.email)
+    
+    return PasswordResetResponse(
+        message="Password reset token generated (in production, this would be emailed)",
+        reset_token=reset_token,
+    )
+
+
+@router.post("/password-reset/confirm", response_model=PasswordResetResponse)
+def confirm_password_reset(
+    payload: PasswordResetConfirm, session: Session = Depends(get_session)
+) -> PasswordResetResponse:
+    email = verify_password_reset_token(payload.token)
+    if email is None:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid or expired token")
+    
+    statement = select(User).where(User.email == email)
+    user = session.exec(statement).first()
+    if user is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+    
+    user.hashed_password = hash_password(payload.new_password)
+    user.touch()
+    session.add(user)
+    session.commit()
+    
+    return PasswordResetResponse(message="Password successfully reset")
 
 
 __all__ = ["router"]

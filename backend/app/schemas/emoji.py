@@ -15,6 +15,14 @@ class EmojiCreate(EmojiBase):
     submitter_email: Optional[EmailStr] = None
 
 
+class EmojiUpdate(BaseModel):
+    symbol: Optional[str] = Field(default=None, min_length=1, max_length=8)
+    title: Optional[str] = Field(default=None, max_length=128)
+    description: Optional[str] = Field(default=None, max_length=256)
+    category: Optional[str] = Field(default=None, max_length=64)
+    keywords: Optional[list[str]] = None
+
+
 class Emoji(EmojiBase):
     id: int
     submitter_email: Optional[EmailStr] = None
@@ -24,4 +32,11 @@ class Emoji(EmojiBase):
         from_attributes = True
 
 
-__all__ = ["Emoji", "EmojiBase", "EmojiCreate"]
+class EmojiListResponse(BaseModel):
+    items: list[Emoji]
+    total: int
+    limit: int
+    offset: int
+
+
+__all__ = ["Emoji", "EmojiBase", "EmojiCreate", "EmojiUpdate", "EmojiListResponse"]

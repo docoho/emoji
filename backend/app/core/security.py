@@ -27,4 +27,27 @@ def decode_token(token: str) -> dict[str, Any]:
     return jwt.decode(token, settings.secret_key, algorithms=[settings.algorithm])
 
 
-__all__ = ["create_access_token", "decode_token", "hash_password", "verify_password"]
+def create_password_reset_token(email: str) -> str:
+    expire = datetime.utcnow() + timedelta(hours=1)
+    to_encode: dict[str, Any] = {"sub": email, "exp": expire, "type": "password_reset"}
+    return jwt.encode(to_encode, settings.secret_key, algorithm=settings.algorithm)
+
+
+def verify_password_reset_token(token: str) -> Optional[str]:
+    try:
+        payload = decode_token(token)
+        if payload.get("type") != "password_reset":
+            return None
+        return payload.get("sub")
+    except Exception:
+        return None
+
+
+__all__ = [
+    "create_access_token",
+    "decode_token",
+    "hash_password",
+    "verify_password",
+    "create_password_reset_token",
+    "verify_password_reset_token",
+]

@@ -1,4 +1,6 @@
 <script setup>
+import { ref } from 'vue'
+
 const props = defineProps({
   emoji: {
     type: Object,
@@ -6,30 +8,88 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits(['delete'])
+const emit = defineEmits(['delete', 'update'])
+
+const isEditing = ref(false)
+const editForm = ref({
+  symbol: props.emoji.symbol,
+  title: props.emoji.title,
+  description: props.emoji.description || '',
+  category: props.emoji.category || '',
+  keywords: props.emoji.keywords || [],
+})
 
 const handleDelete = () => {
   emit('delete', props.emoji)
+}
+
+const startEdit = () => {
+  editForm.value = {
+    symbol: props.emoji.symbol,
+    title: props.emoji.title,
+    description: props.emoji.description || '',
+    category: props.emoji.category || '',
+    keywords: [...(props.emoji.keywords || [])],
+  }
+  isEditing.value = true
+}
+
+const cancelEdit = () => {
+  isEditing.value = false
+}
+
+const saveEdit = () => {
+  const payload = {
+    symbol: editForm.value.symbol,
+    title: editForm.value.title,
+    description: editForm.value.description || undefined,
+    category: editForm.value.category || undefined,
+    keywords: editForm.value.keywords.length > 0 ? editForm.value.keywords : undefined,
+  }
+  emit('update', props.emoji, payload)
+  isEditing.value = false
+}
+
+const updateKeywords = (e) => {
+  editForm.value.keywords = e.target.value
+    .split(',')
+    .map(k => k.trim())
+    .filter(k => k)
 }
 </script>
 
 <template>
   <article class="card">
-    <div class="symbol" aria-hidden="true">{{ emoji.symbol }}</div>
-    <h3>{{ emoji.title }}</h3>
-    <p v-if="emoji.description" class="description">{{ emoji.description }}</p>
-    <ul class="meta">
-      <li v-if="emoji.category">{{ emoji.category }}</li>
-      <li v-for="tag in emoji.keywords" :key="tag">#{{ tag }}</li>
-    </ul>
-    <button
-      v-if="emoji.can_delete"
-      type="button"
-      class="delete"
-      @click="handleDelete"
-    >
-      Delete
-    </button>
+    <div v-if="!isEditing">
+      <div class="symbol" aria-hidden="true">{{ emoji.symbol }}</div>
+      <h3>{{ emoji.title }}</h3>
+      <p v-if="emoji.description" class="description">{{ emoji.description }}</p>
+      <ul class="meta">
+        <li v-if="emoji.category">{{ emoji.category }}</li>
+        <li v-for="tag in emoji.keywords" :key="tag">#{{ tag }}</li>
+      </ul>
+      <div v-if="emoji.can_delete" class="actions">
+        <button type="button" class="edit" @click="startEdit">Edit</button>
+        <button type="button" class="delete" @click="handleDelete">Delete</button>
+      </div>
+    </div>
+
+    <div v-else class="edit-form">
+      <input v-model="editForm.symbol" placeholder="Emoji symbol" maxlength="8" class="input" />
+      <input v-model="editForm.title" placeholder="Title" class="input" />
+      <textarea v-model="editForm.description" placeholder="Description" class="textarea"></textarea>
+      <input v-model="editForm.category" placeholder="Category" class="input" />
+      <input 
+        :value="editForm.keywords.join(', ')" 
+        @input="updateKeywords"
+        placeholder="Keywords (comma-separated)" 
+        class="input" 
+      />
+      <div class="actions">
+        <button type="button" class="save" @click="saveEdit">Save</button>
+        <button type="button" class="cancel" @click="cancelEdit">Cancel</button>
+      </div>
+    </div>
   </article>
 </template>
 
@@ -79,9 +139,27 @@ const handleDelete = () => {
   padding: 0.25rem 0.6rem;
 }
 
-.delete {
-  align-self: flex-start;
+.actions {
+  display: flex;
+  gap: 0.5rem;
   margin-top: 0.5rem;
+}
+
+.edit {
+  border: 1px solid rgba(99, 102, 241, 0.5);
+  background: rgba(99, 102, 241, 0.1);
+  color: #4338ca;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.edit:hover {
+  background: rgba(99, 102, 241, 0.2);
+}
+
+.delete {
   border: 1px solid rgba(239, 68, 68, 0.5);
   background: rgba(239, 68, 68, 0.1);
   color: #b91c1c;
@@ -93,5 +171,53 @@ const handleDelete = () => {
 
 .delete:hover {
   background: rgba(239, 68, 68, 0.2);
+}
+
+.edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.input,
+.textarea {
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid #cbd5e1;
+  font-size: 0.95rem;
+  font-family: inherit;
+}
+
+.textarea {
+  min-height: 60px;
+  resize: vertical;
+}
+
+.save {
+  background: linear-gradient(120deg, #6366f1, #ec4899);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.save:hover {
+  opacity: 0.9;
+}
+
+.cancel {
+  border: 1px solid #cbd5e1;
+  background: white;
+  color: #475569;
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.cancel:hover {
+  background: #f1f5f9;
 }
 </style>

@@ -8,10 +8,14 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits(['delete'])
+const emit = defineEmits(['delete', 'update'])
 
 const handleDelete = (emoji) => {
   emit('delete', emoji)
+}
+
+const handleUpdate = (emoji, payload) => {
+  emit('update', emoji, payload)
 }
 </script>
 
@@ -23,6 +27,7 @@ const handleDelete = (emoji) => {
       :key="item.id"
       :emoji="item"
       @delete="handleDelete"
+      @update="handleUpdate"
     />
   </section>
 </template>
