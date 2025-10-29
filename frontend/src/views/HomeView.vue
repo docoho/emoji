@@ -16,7 +16,7 @@ const searchQuery = ref('')
 const categoryFilter = ref('')
 const sortOrder = ref('date_desc')
 const currentPage = ref(1)
-const pageSize = ref(20)
+const pageSize = ref(8)
 
 const { token, isAuthenticated } = useAuth()
 
