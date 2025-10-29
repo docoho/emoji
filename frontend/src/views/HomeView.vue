@@ -47,6 +47,12 @@ const handleSearch = () => {
   loadEmojis()
 }
 
+const clearSearch = () => {
+  searchQuery.value = ''
+  currentPage.value = 1
+  loadEmojis()
+}
+
 const handleFilterChange = () => {
   currentPage.value = 1
   loadEmojis()
@@ -125,31 +131,44 @@ watch(token, () => {
 
     <section class="content">
       <div class="filters">
-        <input
-          v-model="searchQuery"
-          type="text"
-          placeholder="Search emojis..."
-          class="search-input"
-          @keyup.enter="handleSearch"
-        />
+        <div class="search-container">
+          <input
+            v-model="searchQuery"
+            type="text"
+            placeholder="Search emojis..."
+            class="search-input"
+            @keyup.enter="handleSearch"
+          />
+          <button 
+            v-if="searchQuery" 
+            class="clear-btn" 
+            @click="clearSearch"
+            type="button"
+            aria-label="Clear search"
+          >
+            ✕
+          </button>
+        </div>
         <button class="search-btn" @click="handleSearch">Search</button>
-        <select v-model="categoryFilter" class="filter-select" @change="handleFilterChange">
-          <option value="">All Categories</option>
-          <option value="People">People</option>
-          <option value="Nature">Nature</option>
-          <option value="Food">Food</option>
-          <option value="Activities">Activities</option>
-          <option value="Travel">Travel</option>
-          <option value="Objects">Objects</option>
-          <option value="Symbols">Symbols</option>
-          <option value="Flags">Flags</option>
-        </select>
-        <select v-model="sortOrder" class="filter-select" @change="handleFilterChange">
-          <option value="date_desc">Newest First</option>
-          <option value="date_asc">Oldest First</option>
-          <option value="title_asc">Title A-Z</option>
-          <option value="title_desc">Title Z-A</option>
-        </select>
+        <div class="filter-group">
+          <select v-model="categoryFilter" class="filter-select" @change="handleFilterChange">
+            <option value="">All Categories</option>
+            <option value="People">People</option>
+            <option value="Nature">Nature</option>
+            <option value="Food">Food</option>
+            <option value="Activities">Activities</option>
+            <option value="Travel">Travel</option>
+            <option value="Objects">Objects</option>
+            <option value="Symbols">Symbols</option>
+            <option value="Flags">Flags</option>
+          </select>
+          <select v-model="sortOrder" class="filter-select" @change="handleFilterChange">
+            <option value="date_desc">Newest First</option>
+            <option value="date_asc">Oldest First</option>
+            <option value="title_asc">Title A-Z</option>
+            <option value="title_desc">Title Z-A</option>
+          </select>
+        </div>
       </div>
 
       <p v-if="loading" class="status">Loading emojis…</p>
@@ -240,10 +259,10 @@ watch(token, () => {
 
 .filters {
   display: flex;
-  gap: 0.75rem;
+  flex-direction: column;
+  gap: 1rem;
   margin-bottom: 1.5rem;
-  flex-wrap: wrap;
-  align-items: stretch;
+  align-items: center;
 }
 
 @media (min-width: 768px) {
@@ -252,24 +271,52 @@ watch(token, () => {
   }
 }
 
+.search-container {
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+  display: flex;
+  align-items: center;
+}
+
 .search-input {
-  flex: 1 1 100%;
-  min-width: 200px;
+  width: 100%;
   padding: 0.6rem 1rem;
+  padding-right: 2.5rem;
   border-radius: 0.5rem;
   border: 1px solid #cbd5e1;
   font-size: 0.95rem;
 }
 
-@media (min-width: 640px) {
-  .search-input {
-    flex: 1 1 auto;
-  }
+.search-input:focus {
+  outline: none;
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.clear-btn {
+  position: absolute;
+  right: 0.5rem;
+  background: transparent;
+  border: none;
+  color: #9ca3af;
+  font-size: 1.25rem;
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.25rem;
+  transition: all 0.2s;
+}
+
+.clear-btn:hover {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.1);
 }
 
 .search-btn {
-  flex: 0 0 auto;
-  padding: 0.6rem 1.5rem;
+  padding: 0.6rem 2rem;
   background: linear-gradient(120deg, #6366f1, #ec4899);
   color: white;
   border: none;
@@ -277,26 +324,46 @@ watch(token, () => {
   font-weight: 600;
   cursor: pointer;
   white-space: nowrap;
+  font-size: 1rem;
 }
 
 .search-btn:hover {
   opacity: 0.9;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+.filter-group {
+  display: flex;
+  gap: 0.75rem;
+  width: 100%;
+  max-width: 600px;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 .filter-select {
   flex: 1 1 calc(50% - 0.375rem);
-  min-width: 140px;
+  min-width: 160px;
   padding: 0.6rem 1rem;
   border-radius: 0.5rem;
   border: 1px solid #cbd5e1;
   font-size: 0.95rem;
   background: white;
   cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.filter-select:focus {
+  outline: none;
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
 }
 
 @media (min-width: 640px) {
   .filter-select {
     flex: 0 1 auto;
+    min-width: 180px;
   }
 }
 
