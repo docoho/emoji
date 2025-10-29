@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref, watch } from 'vue'
+import { onMounted, onUnmounted, ref, watch } from 'vue'
 
 import EmojiGrid from '../components/EmojiGrid.vue'
 import EmojiSubmitForm from '../components/EmojiSubmitForm.vue'
@@ -19,6 +19,38 @@ const currentPage = ref(1)
 const pageSize = ref(8)
 
 const { token, isAuthenticated } = useAuth()
+
+const floatingEmojis = ref([])
+const emojiPool = ['😀', '😃', '😄', '😁', '😆', '😅', '🤣', '😂', '🙂', '🙃', '😉', '😊', '😇', '🥰', '😍', '🤩', '😘', '😗', '😚', '😙', '🥲', '😋', '😛', '😜', '🤪', '😝', '🤑', '🤗', '🤭', '🤫', '🤔', '🤐', '🤨', '😐', '😑', '😶', '😏', '😒', '🙄', '😬', '😌', '😔', '😪', '🤤', '😴', '😷', '🤒', '🤕', '🤢', '🤮', '🤧', '🥵', '🥶', '🥴', '😵', '🤯', '🤠', '🥳', '🥸', '😎', '🤓', '🧐', '😕', '😟', '🙁', '☹️', '😮', '😯', '😲', '😳', '🥺', '😦', '😧', '😨', '😰', '😥', '😢', '😭', '😱', '😖', '😣', '😞', '😓', '😩', '😫', '🥱', '😤', '😡', '😠', '🤬', '😈', '👿', '💀', '☠️', '💩', '🤡', '👹', '👺', '👻', '👽', '👾', '🤖', '😺', '😸', '😹', '😻', '😼', '😽', '🙀', '😿', '😾']
+let animationInterval = null
+
+const addFloatingEmoji = () => {
+  const emoji = emojiPool[Math.floor(Math.random() * emojiPool.length)]
+  const id = Date.now() + Math.random()
+  const startX = Math.random() * 100
+  const startY = Math.random() * 100
+  const duration = 2000 + Math.random() * 2000
+  
+  floatingEmojis.value.push({ id, emoji, startX, startY, duration })
+  
+  setTimeout(() => {
+    floatingEmojis.value = floatingEmojis.value.filter(e => e.id !== id)
+  }, duration)
+}
+
+const startEmojiAnimation = () => {
+  addFloatingEmoji()
+  animationInterval = setInterval(() => {
+    addFloatingEmoji()
+  }, 500 + Math.random() * 1000)
+}
+
+const stopEmojiAnimation = () => {
+  if (animationInterval) {
+    clearInterval(animationInterval)
+    animationInterval = null
+  }
+}
 
 const loadEmojis = async () => {
   loading.value = true
@@ -115,7 +147,14 @@ const prevPage = () => {
 
 const totalPages = () => Math.ceil(total.value / pageSize.value)
 
-onMounted(loadEmojis)
+onMounted(() => {
+  loadEmojis()
+  startEmojiAnimation()
+})
+
+onUnmounted(() => {
+  stopEmojiAnimation()
+})
 
 watch(token, () => {
   loadEmojis()
@@ -125,8 +164,21 @@ watch(token, () => {
 <template>
   <main class="page">
     <header class="hero">
-      <h1>Emoji Showcase</h1>
-      <p>Browse curated emojis shared by our community.</p>
+      <div class="hero-title-container">
+        <h1>Emoji Showcase</h1>
+        <div 
+          v-for="emoji in floatingEmojis" 
+          :key="emoji.id" 
+          class="floating-emoji"
+          :style="{
+            '--start-x': emoji.startX + '%',
+            '--start-y': emoji.startY + '%',
+            '--duration': emoji.duration + 'ms'
+          }"
+        >
+          {{ emoji.emoji }}
+        </div>
+      </div>
     </header>
 
     <section class="content">
@@ -237,14 +289,55 @@ watch(token, () => {
   }
 }
 
+.hero-title-container {
+  position: relative;
+  display: inline-block;
+  margin: 0 auto;
+}
+
 .hero h1 {
   font-size: clamp(2rem, 5vw, 3.5rem);
   font-weight: 700;
+  position: relative;
+  z-index: 1;
 }
 
 .hero p {
   color: #475569;
   font-size: clamp(0.95rem, 2vw, 1.05rem);
+}
+
+.floating-emoji {
+  position: absolute;
+  font-size: clamp(1.5rem, 3vw, 2.5rem);
+  pointer-events: none;
+  left: var(--start-x);
+  top: var(--start-y);
+  animation: float-and-fade var(--duration) ease-in-out forwards;
+  z-index: 0;
+}
+
+@keyframes float-and-fade {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.5) rotate(0deg);
+  }
+  15% {
+    opacity: 1;
+    transform: translate(10px, -10px) scale(1) rotate(15deg);
+  }
+  50% {
+    opacity: 0.8;
+    transform: translate(20px, -30px) scale(1.1) rotate(-10deg);
+  }
+  85% {
+    opacity: 0.6;
+    transform: translate(15px, -50px) scale(0.9) rotate(20deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(0, -70px) scale(0.5) rotate(-15deg);
+  }
 }
 
 .content {
@@ -365,17 +458,26 @@ watch(token, () => {
   min-width: 160px;
   padding: 0.6rem 1rem;
   border-radius: 0.5rem;
-  border: 1px solid #cbd5e1;
+  border: none;
   font-size: 0.95rem;
-  background: white;
+  background: linear-gradient(120deg, #6366f1, #ec4899);
+  color: white;
+  font-weight: 600;
   cursor: pointer;
-  transition: border-color 0.2s;
+  transition: all 0.2s;
+  text-align: center;
+}
+
+.filter-select:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
 }
 
 .filter-select:focus {
   outline: none;
-  border-color: #6366f1;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  opacity: 0.9;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
 }
 
 @media (min-width: 640px) {
