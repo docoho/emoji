@@ -34,34 +34,18 @@ const closeModal = () => {
   <section class="grid-container">
     <p v-if="!props.emojis.length" class="empty">No emojis available.</p>
     
-    <div v-else class="horizontal-scroll">
-      <div class="scroll-content">
-        <!-- First set of emojis -->
-        <div
-          v-for="item in props.emojis"
-          :key="`first-${item.id}`"
-          class="emoji-item"
-          @click="handleEmojiClick(item)"
-        >
-          <EmojiCard
-            :emoji="item"
-            @delete="handleDelete"
-            @update="handleUpdate"
-          />
-        </div>
-        <!-- Duplicate set for seamless loop -->
-        <div
-          v-for="item in props.emojis"
-          :key="`second-${item.id}`"
-          class="emoji-item"
-          @click="handleEmojiClick(item)"
-        >
-          <EmojiCard
-            :emoji="item"
-            @delete="handleDelete"
-            @update="handleUpdate"
-          />
-        </div>
+    <div v-else class="emoji-grid">
+      <div
+        v-for="item in props.emojis"
+        :key="item.id"
+        class="emoji-item"
+        @click="handleEmojiClick(item)"
+      >
+        <EmojiCard
+          :emoji="item"
+          @delete="handleDelete"
+          @update="handleUpdate"
+        />
       </div>
     </div>
 
@@ -99,42 +83,19 @@ const closeModal = () => {
   width: 100%;
 }
 
-.horizontal-scroll {
-  overflow: hidden;
-  width: 100%;
-  position: relative;
-  padding: 1rem 0;
-}
-
-.scroll-content {
-  display: flex;
+.emoji-grid {
+  display: grid;
   gap: 1.5rem;
-  animation: scrollRight 60s linear infinite;
-  will-change: transform;
-}
-
-.scroll-content:hover {
-  animation-play-state: paused;
-}
-
-@keyframes scrollRight {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(-50%);
-  }
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
 }
 
 .emoji-item {
-  flex: 0 0 auto;
-  width: 250px;
   cursor: pointer;
-  transition: transform 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .emoji-item:hover {
-  transform: scale(1.05);
+  transform: translateY(-4px);
   z-index: 10;
 }
 
