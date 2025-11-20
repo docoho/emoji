@@ -4,7 +4,7 @@ frontend:
 	cd frontend && npm run dev
 
 backend:
-	cd backend && ./venv/bin/uvicorn app.main:app --reload
+	cd backend && ./venv/bin/uvicorn app.main:app --reload --host 0.0.0.0
 
 backend-test:
 	cd backend && ./venv/bin/python -m pytest
@@ -14,7 +14,7 @@ lint:
 
 run-bg:
 	@echo "Starting backend in background..."
-	@cd backend && exec nohup ./venv/bin/uvicorn app.main:app --reload > ../backend.log 2>&1 & echo $$! > backend.pid
+	@cd backend && exec nohup ./venv/bin/uvicorn app.main:app --reload --host 0.0.0.0 > ../backend.log 2>&1 & echo $$! > backend.pid
 	@echo "Starting frontend in background..."
 	@cd frontend && exec nohup npm run dev > ../frontend.log 2>&1 & echo $$! > frontend.pid
 	@echo "Servers started. Logs in backend.log and frontend.log"
