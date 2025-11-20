@@ -104,6 +104,20 @@ npm run build
 
 The frontend will be available at `http://localhost:5173`
 
+### Background Execution
+
+You can run both backend and frontend servers in the background using the provided Makefile targets. This is useful for keeping the servers running without occupying your terminal.
+
+```bash
+# Start both backend and frontend in background
+make run-bg
+
+# Stop both background services
+make stop
+```
+
+Logs will be written to `backend.log` and `frontend.log` in the root directory.
+
 ## API Endpoints
 
 ### Authentication
