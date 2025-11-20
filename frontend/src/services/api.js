@@ -1,6 +1,8 @@
 import { mockEmojis } from '../data/mockEmojis'
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL ?? ''
+// Always use relative path to allow Vite proxy to handle forwarding to backend
+// This ensures it works from any device on the network (not just localhost)
+const API_BASE = ''
 
 export async function fetchEmojis(token, params = {}) {
   const queryParams = new URLSearchParams()
