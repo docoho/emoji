@@ -30,7 +30,7 @@ onMounted(() => {
 <template>
   <div class="app-shell">
     <nav class="top-nav">
-      <RouterLink class="brand" :to="{ name: 'home' }">Emoji Portal</RouterLink>
+      <RouterLink class="brand" :to="{ name: 'home' }">Emoji stands for everything.</RouterLink>
 
       <div class="nav-actions">
         <RouterLink class="link" :to="{ name: 'home' }">Home</RouterLink>

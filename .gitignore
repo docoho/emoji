@@ -4,11 +4,17 @@ frontend/dist/
 
 # Python
 backend/.venv/
+backend/venv/
 backend/__pycache__/
 backend/.pytest_cache/
 backend/.ruff_cache/
 backend/app.db
 backend/*.db
+backend/**/*.egg-info/
+
+# Logs and PIDs
+*.log
+*.pid
 
 # OS
 .DS_Store
