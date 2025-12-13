@@ -6,6 +6,7 @@ export default defineConfig({
   plugins: [vue()],
   server: {
     host: true,
+    allowedHosts: ["emoji.undov.com"],
     proxy: {
       '/api': {
         target: 'http://127.0.0.1:8000',
