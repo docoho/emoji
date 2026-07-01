@@ -49,7 +49,7 @@ onUnmounted(() => {
 <template>
   <div class="app-shell">
     <nav class="top-nav">
-      <RouterLink class="brand" :to="{ name: 'home' }">Emoji stands for everything.</RouterLink>
+      <RouterLink class="brand" :to="{ name: 'home' }">I love emojis very much</RouterLink>
 
       <div class="nav-actions">
         <RouterLink class="link" :to="{ name: 'home' }">Home</RouterLink>
