@@ -1,0 +1,44 @@
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+
+# Runtime logs / process files
+*.log
+*.pid
+nohup.out
+
+# Database (user data, not for version control)
+backend/app.db
+
+# Environment files (contain secrets)
+.env
+.env.*
+backend/.env
+backend/.env.*
+!.env.example
+!backend/.env.example
+
+# Local tool configuration
+.mcp.json
+.rtk/
+
+# Claude Code local-only overrides
+CLAUDE.local.md
+.claude/settings.local.json
+.claude/**/settings.local.json
+
+# Dependencies / build outputs
+node_modules/
+frontend/node_modules/
+venv/
+backend/venv/
+dist/
+frontend/dist/
+*.egg-info/
+
+# Python / test / lint caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/

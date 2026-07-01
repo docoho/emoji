@@ -1,0 +1,42 @@
+export const mockEmojis = [
+  {
+    id: 1,
+    symbol: '😀',
+    title: 'Grinning Face',
+    description: 'A classic smile conveying general happiness.',
+    category: 'Smileys',
+    keywords: ['happy', 'smile', 'joy'],
+  },
+  {
+    id: 2,
+    symbol: '🚀',
+    title: 'Rocket',
+    description: 'Symbolizes fast progress or launching new ideas.',
+    category: 'Travel',
+    keywords: ['launch', 'startup', 'space'],
+  },
+  {
+    id: 3,
+    symbol: '🎉',
+    title: 'Party Popper',
+    description: 'Used to celebrate special occasions and wins.',
+    category: 'Activities',
+    keywords: ['celebration', 'party', 'congrats'],
+  },
+  {
+    id: 4,
+    symbol: '🤖',
+    title: 'Robot',
+    description: 'Represents technology, automation, or playful robotics.',
+    category: 'Objects',
+    keywords: ['bot', 'automation', 'ai'],
+  },
+  {
+    id: 5,
+    symbol: '🌈',
+    title: 'Rainbow',
+    description: 'Often used for joy, hope, and inclusivity.',
+    category: 'Nature',
+    keywords: ['hope', 'color', 'pride'],
+  },
+]

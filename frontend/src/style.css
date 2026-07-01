@@ -1,0 +1,145 @@
+:root {
+  font-family: "Avenir Next", "Segoe UI", "Trebuchet MS", "Helvetica Neue", Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ─── Light theme (default) ─── */
+:root, [data-theme="light"] {
+  color-scheme: light;
+
+  --color-bg-surface: rgba(255, 255, 255, 0.75);
+  --color-bg-surface-raised: rgba(255, 255, 255, 0.85);
+  --color-bg-surface-solid: rgba(255, 255, 255, 0.9);
+  --color-bg-solid: #ffffff;
+  --color-bg-input: #ffffff;
+  --color-bg-nav: rgba(15, 23, 42, 0.85);
+
+  --bg-page-1: #fdf2f8;
+  --bg-page-2: #e0f2fe;
+  --bg-page-3: #ede9fe;
+  --bg-auth-1: #ede9fe;
+  --bg-auth-2: #ecfeff;
+  --bg-register-1: #fef3c7;
+  --bg-register-2: #f5f3ff;
+
+  --color-text: #0f172a;
+  --color-text-heading: #1f2937;
+  --color-text-secondary: #475569;
+  --color-text-muted: #6b7280;
+  --color-text-link: #4f46e5;
+  --color-text-error: #dc2626;
+  --color-text-success: #047857;
+
+  --color-border: rgba(209, 213, 219, 0.7);
+  --color-border-input: #cbd5e1;
+  --color-border-light: #e5e7eb;
+
+  --color-tag-bg: rgba(15, 23, 42, 0.05);
+  --color-keyword-bg: rgba(99, 102, 241, 0.1);
+  --color-keyword-text: #4338ca;
+
+  --shadow-card: 0 8px 24px rgba(15, 23, 42, 0.08);
+  --shadow-card-hover: 0 12px 34px rgba(15, 23, 42, 0.12);
+  --shadow-elevated: 0 12px 30px rgba(15, 23, 42, 0.12);
+  --shadow-modal: 0 25px 50px rgba(0, 0, 0, 0.3);
+
+  --color-google-btn-bg: #ffffff;
+  --color-google-btn-hover: #f9fafb;
+  --color-google-btn-border: #d1d5db;
+  --color-cancel-hover: #f1f5f9;
+  --color-divider: #d1d5db;
+}
+
+/* ─── Dark theme ─── */
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  --color-bg-surface: rgba(30, 30, 50, 0.75);
+  --color-bg-surface-raised: rgba(30, 30, 50, 0.85);
+  --color-bg-surface-solid: rgba(30, 30, 50, 0.95);
+  --color-bg-solid: #1e1e2e;
+  --color-bg-input: rgba(20, 20, 40, 0.8);
+  --color-bg-nav: rgba(10, 10, 25, 0.92);
+
+  --bg-page-1: #1a0f25;
+  --bg-page-2: #0f1729;
+  --bg-page-3: #150f25;
+  --bg-auth-1: #150f25;
+  --bg-auth-2: #0f1a29;
+  --bg-register-1: #1a1505;
+  --bg-register-2: #150f25;
+
+  --color-text: #e2e8f0;
+  --color-text-heading: #f1f5f9;
+  --color-text-secondary: #94a3b8;
+  --color-text-muted: #64748b;
+  --color-text-link: #818cf8;
+  --color-text-error: #f87171;
+  --color-text-success: #34d399;
+
+  --color-border: rgba(100, 116, 139, 0.3);
+  --color-border-input: rgba(100, 116, 139, 0.5);
+  --color-border-light: rgba(100, 116, 139, 0.2);
+
+  --color-tag-bg: rgba(255, 255, 255, 0.08);
+  --color-keyword-bg: rgba(99, 102, 241, 0.25);
+  --color-keyword-text: #a5b4fc;
+
+  --shadow-card: 0 8px 24px rgba(0, 0, 0, 0.3);
+  --shadow-card-hover: 0 12px 34px rgba(0, 0, 0, 0.4);
+  --shadow-elevated: 0 12px 30px rgba(0, 0, 0, 0.35);
+  --shadow-modal: 0 25px 50px rgba(0, 0, 0, 0.6);
+
+  --color-google-btn-bg: rgba(30, 30, 50, 0.8);
+  --color-google-btn-hover: rgba(40, 40, 60, 0.9);
+  --color-google-btn-border: rgba(100, 116, 139, 0.4);
+  --color-cancel-hover: rgba(40, 40, 60, 0.5);
+  --color-divider: rgba(100, 116, 139, 0.3);
+}
+
+/* ─── Global defaults ─── */
+a {
+  font-weight: 500;
+  color: var(--color-text-link);
+  text-decoration: inherit;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  color: var(--color-text);
+  background-color: var(--color-bg-solid);
+}
+
+h1 {
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  line-height: 1.1;
+}
+
+button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+#app {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
